@@ -4,18 +4,12 @@ export class Exam {
     constructor(durationInSeconds, data) {
         this.examData = data;
         this.duration = durationInSeconds;
-        this.timer = new TimerCountDown(durationInSeconds,
-            (timeLeft) => {
-                console.log(timeLeft);//document.getElementById('timer').innerText = this.timer.formatTime(timeLeft);
-            }, 
-            () => {
-                console.log('Hết giờ');
-            }
-        );
+        this.timer = null;
     }
 
     start() {
         // Bắt đầu bài thi
+        if(!this.timer) {return;}
         this.timer.start();
         console.log('Start:', this.timer.timerId);
     }
@@ -29,7 +23,10 @@ export class Exam {
 
     display() {
         // Hiển thị cấu trúc bài thi
-        throw new Error("Lớp con phải tự định nghĩa cách render nội dung!");
+        if(document.getElementById('timer')) {
+            document.getElementById('timer').innerText = this.timer.formatTime()
+        }
+        //throw new Error("Lớp con phải tự định nghĩa cách render nội dung!");
     }
 
 }
