@@ -1,0 +1,7 @@
+.vh-size {
+    height: 93vh;
+}
+.scrollable-column {
+    height: 93%;
+    overflow-y: auto;
+}

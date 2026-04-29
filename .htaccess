@@ -1,0 +1,28 @@
+#deny from all
+# Tắt tính năng liệt kê thư mục
+Options -Indexes
+
+# Tắt tính năng tự động đàm phán nội dung của Apache
+#Options -MultiViews
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    #RewriteEngine On
+    #RewriteBase /vs/
+    
+    # Chỉ Redirect ở đây
+    #RewriteRule ^(.*)$ http://vs.localhost/$1 [R=301,L]
+    #RewriteBase /vs/
+    
+    # Nếu yêu cầu không bắt đầu bằng /public/
+    #RewriteCond %{REQUEST_URI} !^/public/
+    
+    # Chuyển hướng mọi yêu cầu vào thư mục public/
+    RewriteRule ^(.*)$ http://vs.localhost/$1 [L]
+    # 1. Kiểm tra nếu người dùng đang truy cập bằng domain 'localhost'
+    #RewriteCond %{HTTP_HOST} ^localhost$ [NC]
+
+    # 2. Kiểm tra nếu URL có chứa 'vs/public'
+    #RewriteRule ^public/(.*)$ http://vs.localhost/$1 [R=301,L]
+</IfModule>
