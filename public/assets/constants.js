@@ -51,5 +51,3 @@ export const ELEMENTS = {
 };
 
 export const BASE_URL = window.location.origin + '/vsnew/public';
-console.log('base_url', BASE_URL)
-

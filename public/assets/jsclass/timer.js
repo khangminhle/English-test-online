@@ -1,4 +1,3 @@
-// Timer.js
 export class TimerCountDown {
     constructor(durationInSeconds, onTick, onComplete) {
         this.duration = durationInSeconds;

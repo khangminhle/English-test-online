@@ -201,7 +201,6 @@ function disableUserInput() {
 export function disableTakingExam() {
     // User bị vô hiệu hóa bài thi 
     if(STORAGE_KEYS.getData(STORAGE_KEYS.SUBMITTED) === 'true') {
-        console.log('da vo hieu h oa!');
         disableUserInput();
         showIncorrectAnswers();
         showCorrectAnswers();
@@ -540,75 +539,6 @@ function displayBtnPauseTime() {
     if(btnPauseTime === 'Restart') {
         document.getElementById('btn_pause_time').innerText = 'Restart';
         ELEMENTS.btn_pause_time.classList.replace('btn-warning', 'btn-success');
-    }
-}
-
-function timeCountDown(seconds) {
-
-    if(STORAGE_KEYS.getData(STORAGE_KEYS.SUBMITTED) === 'true') {
-        clearInterval(APPSTATE.intervalCountDown);
-        console.log('Đã dừng làn nữa!');
-        return;
-    }
-
-    let totalSeconds = STORAGE_KEYS.getData(STORAGE_KEYS.TIMELEFT);
-    if(!totalSeconds) {
-        totalSeconds = seconds;
-    } else {
-        totalSeconds = Number(totalSeconds);
-    }
-
-    const timerElement = document.getElementById("timer");
-    if(!timerElement) {return;}
-
-    if (APPSTATE.intervalCountDown) {
-        clearInterval(APPSTATE.intervalCountDown);
-    }
-
-    APPSTATE.intervalCountDown = setInterval(function() {
-        let minutes = Math.floor(totalSeconds / 60);
-        let seconds = totalSeconds % 60;
-
-        if(ELEMENTS.btn_pause_time.innerText.trim() === 'Restart') {
-            clearInterval(APPSTATE.intervalCountDown);
-            STORAGE_KEYS.saveData(STORAGE_KEYS.TIMELEFT, String(totalSeconds));
-        }
-
-        timerElement.innerText = 
-        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-        if (totalSeconds <= 0) {
-            clearInterval(APPSTATE.intervalCountDown);
-            STORAGE_KEYS.saveData(STORAGE_KEYS.TIMELEFT, '0');
-            disableTestWhenTimeOut();
-            playSoundEndExam();
-            timerElement.classList.add('text-danger');
-        } else {
-            if(totalSeconds <= 10) {
-                timerElement.classList.add('text-danger');
-            }
-            STORAGE_KEYS.saveData(STORAGE_KEYS.TIMELEFT, String(totalSeconds));
-            totalSeconds--;
-        }
-    }, 1000);
-}
-
-export function pauseTimeCountDown() {
-    if(!ELEMENTS.btn_pause_time) {return;}
-
-    if(ELEMENTS.btn_pause_time.innerText.trim() === 'Pause') {
-        ELEMENTS.btn_pause_time.innerText = 'Restart';
-        STORAGE_KEYS.saveData(STORAGE_KEYS.BUTTON_TIME, 'Restart');
-        ELEMENTS.btn_pause_time.classList.replace('btn-warning', 'btn-success');
-    } else {
-        ELEMENTS.btn_pause_time.innerText = 'Pause';
-        ELEMENTS.btn_pause_time.classList.replace('btn-success', 'btn-warning');
-        STORAGE_KEYS.saveData(STORAGE_KEYS.BUTTON_TIME, 'Pause');
-
-        // Restart lại bộ đếm
-        let secondsLeft = STORAGE_KEYS.getData(STORAGE_KEYS.TIMELEFT);
-        if(secondsLeft > 0) {timeCountDown(Number(secondsLeft));}
-
     }
 }
 
