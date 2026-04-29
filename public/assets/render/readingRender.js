@@ -62,7 +62,7 @@ export function timePauseRestart() {
         console.log('restart đồng hồ!');
 
         // Lấy lại thời gian còn lại đã lưu khi Pause
-        const remaining = Number(STORAGE_KEYS.getData('REMAINING_TIME_PAUSED'));
+        const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
         
         // Tính hạn chót mới: Bây giờ + thời gian còn lại
         const newEndTime = Date.now() + remaining;
@@ -71,7 +71,6 @@ export function timePauseRestart() {
         STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(newEndTime));
 
      
-        console.log('timeleft bắt đầu:', Math.floor(remaining / 1000));
         timeStart(Math.floor(remaining / 1000));
         STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'false');
         ELEMENTS.btn_pause_time.innerText = 'Pause';
@@ -166,6 +165,14 @@ export function displayReadingQuestions(rp_number='rp1') {
 
 }
 
+function resetStorageKeys() {
+    const currentTheme = STORAGE_KEYS.getData(STORAGE_KEYS.THEME);
+    localStorage.clear();
+    if(currentTheme) {
+        STORAGE_KEYS.saveData(STORAGE_KEYS.THEME, currentTheme);
+    }
+}
+
 export function goToHomepage() {
     Swal.fire({
         title: 'Bạn có chắc chắn muốn về trang chủ',
@@ -178,7 +185,8 @@ export function goToHomepage() {
         cancelButtonText: 'Ở lại'
     }).then((result) => {
         if (result.isConfirmed) {
-            localStorage.clear();
+            // Giữ lại theme hiện tại
+            resetStorageKeys();
             window.location.href = BASE_URL;
         }
     });
@@ -205,7 +213,7 @@ export function disableTakingExam() {
 }
 
 export function displayOldAnswers() {
-    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); //JSON.parse(localStorage.getItem('answered'));
+    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
     if(answered) {
         for(let ans in answered) {
             let id_ans = ans + answered[ans];
@@ -302,11 +310,11 @@ function getNotAnsweredQuestions() {
 
 function getUserIncorrectAnswers() {
     let correctAnswers = getCorrectAnswers();
-    let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); //JSON.parse(localStorage.getItem('answered'));
+    let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
 
     if(!correctAnswers) {return;}
     if(!userAnswers) {return;}
-    //if(!(correctAnswers.length === Object.keys(userAnswers).length)) {return;}
+    
 
     let userIncorrectAnswers = [];
 
@@ -321,11 +329,10 @@ function getUserIncorrectAnswers() {
 
 function getUserCorrectAnswers() {
     let correctAnswers = getCorrectAnswers();
-    let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); //JSON.parse(localStorage.getItem('answered'));
+    let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
 
     if(!correctAnswers) {return;}
     if(!userAnswers) {return;}
-    //if(!(correctAnswers.length === Object.keys(userAnswers).length)) {return;}
 
     let userCorrectAnswers = [];
 
@@ -357,13 +364,12 @@ export function chooseAnswer(user_ans) {
 
     console.log(answered);
 
-    //console.log(localStorage.getItem('answered'));
 }
 
 export function submitTest() {
 
     
-    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); //localStorage.getItem('answered');
+    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
     console.log('ans', answered);
     if(!answered) {
         Swal.fire({
@@ -377,7 +383,7 @@ export function submitTest() {
             cancelButtonText: 'Tiếp tục'
         }).then((result) => {
             if (result.isConfirmed) {
-                localStorage.clear();
+                resetStorageKeys();
                 window.location.href = BASE_URL;
             }
         });
@@ -385,33 +391,10 @@ export function submitTest() {
         return;
     }
 
-    //answered = JSON.parse(answered);
     let num_answers = Object.keys(answered).length;
     let totalQuestions = Object.keys(getCorrectAnswers()).length;
     let totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
 
-    /*
-    if(num_answers < 40) {
-        Swal.fire({
-            title: 'Bạn chưa làm đủ câu hỏi !',
-            text: "Bạn có chắc chắn kết thúc bài thi ?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Kết thúc',
-            cancelButtonText: 'Tiếp tục'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                //localStorage.clear();
-                //window.location.href = window.location.origin;
-                disableTakingExam();
-            }
-        });
-
-        return;
-    }
-    */
 
     let warningNotification = '';
     if(num_answers < 40) {
@@ -486,7 +469,6 @@ export function submitTest() {
 
                 popupHTML += '</div>';
                 
-                //console.log(sortedByPassage);
 
                 Swal.fire({
                     title: 'Các câu bạn chưa làm:',
