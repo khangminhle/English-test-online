@@ -1,8 +1,18 @@
-import { Timer } from './timer.js';
+import { TimerCountDown } from './timer.js';
+
 export class Exam {
     constructor(durationInSeconds) {
         this.duration = durationInSeconds;
-        this.timer = Time
+        this.timer = new TimerCountDown(durationInSeconds, ());
+
+        APPSTATE.currentTimer = new TimerCountDown(seconds,
+            (timeLeft) => {
+                document.getElementById('timer').innerText = APPSTATE.currentTimer.formatTime(timeLeft);
+            }, 
+            () => {
+                disableTestWhenTimeOut();
+            }
+        );
     }
 
     start() {
