@@ -119,7 +119,6 @@ export function displayReadingPassage(rp_number='rp1') {
     }
 
     ELEMENTS.passage_view.innerHTML = html;
-    //document.getElementById('passage_view').innerHTML = html;
 }
 
 export function displayReadingQuestions(rp_number='rp1') {
@@ -150,7 +149,7 @@ export function displayReadingQuestions(rp_number='rp1') {
         html += `<p>${content}</p>`;
         let ans = ['A', 'B', 'C', 'D'];
         for(let j = 0; j < ans.length; j++) {
-            let q_content =  rp_questions[i][ans[j]];//.replace(/<b>|<\/b>/g, '');
+            let q_content =  rp_questions[i][ans[j]];
             if(q_content.includes('<b>')) {
             	q_content = q_content.replace(/<b>|<\/b>/g, '');
             }
@@ -185,19 +184,20 @@ export function goToHomepage() {
     });
 }
 
+function disableUserInput() {
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.disabled = true;
+    });
+}
+
 export function disableTakingExam() {
     // User bị vô hiệu hóa bài thi 
     if(STORAGE_KEYS.getData(STORAGE_KEYS.SUBMITTED) === 'true') {
         console.log('da vo hieu h oa!');
-        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.disabled = true;
-        });
+        disableUserInput();
         showIncorrectAnswers();
         showCorrectAnswers();
         APPSTATE.currentTimer.stop();
-        //document.getElementById('btn_pause_time').style.display = 'none';
-        //timeCountDown(0);
-        //document.getElementById('timer').innerText = 'Submitted';
         document.getElementById('time_area').style.display = 'none';
         document.getElementById('btn_submit').style.display = 'none';
         document.getElementById('btn_done').style.display = 'inline';   
@@ -209,9 +209,7 @@ export function displayOldAnswers() {
     if(answered) {
         for(let ans in answered) {
             let id_ans = ans + answered[ans];
-
             const element = document.querySelector(`input[data-id="${id_ans}"]`);
-
             if (element) {
                 element.checked = true;
             }
@@ -242,11 +240,9 @@ function getCorrectAnswers() {
 
     
     let mappedCorrectAnswers = correctAnswers.map(item => mapping[item] || item);
-
     const result = Object.fromEntries(
         mappedCorrectAnswers.map((val, index) => [(index + 1).toString(), val])
     );
-
     return result;
     
 }
@@ -293,40 +289,15 @@ export function showCorrectAnswers() {
 }
 
 function getNotAnsweredQuestions() {
-    //console.log(correctAnswers, userCorrectAnswers);
-    let correctAnswers = getCorrectAnswers(); // Lấy những đáp án đúng
-    console.log('correct:', correctAnswers);
-    let userCorrectAnswers = getUserCorrectAnswers();
-    console.log('user correct:', userCorrectAnswers);
-    let userIncorrectAnswers = getUserIncorrectAnswers();
-    console.log('user incorrect:', userIncorrectAnswers);
-    let answeredQuestions = [];
-    
-    if(!correctAnswers) {return;}
-    if(!userCorrectAnswers) {return;}
+    let userAnsweredQuestions = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
 
-    let notAnswerList = [];
+    if(!userAnsweredQuestions) {return;}
 
-    for(let i in userCorrectAnswers) {
-        let question_id = userCorrectAnswers[i].match(/(\d+)[a-zA-Z]+/)[1];
-        answeredQuestions.push(question_id);
-    }
+    let correctAnswers = getCorrectAnswers();
 
-    for(let i in userIncorrectAnswers) {
-        let question_id = userIncorrectAnswers[i].match(/(\d+)[a-zA-Z]+/)[1];
-        answeredQuestions.push(question_id);
-    }
-   
-    for(let i in correctAnswers) {
-        console.log(i, answeredQuestions[i]);
-        if(!answeredQuestions.includes(i)) {
-            notAnswerList.push(i);
-        }
-    }
-    console.log('answered:', answeredQuestions);
+    const notAnswerList = Object.keys(correctAnswers).filter(key => !userAnsweredQuestions.hasOwnProperty(key));
 
     return notAnswerList;
-    
 }
 
 function getUserIncorrectAnswers() {
@@ -487,7 +458,7 @@ export function submitTest() {
                 sortedByPassage['Passage 4'] = [];
 
                 for(let i in notAnswerList) {
-                    let question_id = notAnswerList[i];
+                    let question_id = Number(notAnswerList[i]);
                     if(question_id < 11 && question_id > 0) {
                         sortedByPassage['Passage 1'].push(question_id);
                     }
