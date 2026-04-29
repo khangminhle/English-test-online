@@ -1,6 +1,7 @@
-import { setEventListeners as setELReading } from './events/readingEvents.js';
+//import { setEventListeners as setELReading } from './events/readingEvents.js';
 import { setEventListeners as setELHomepage} from './events/homeEvents.js';
-import { renderUI } from './render/readingRender.js';
+import { initExam } from './events/examEvents.js';
+//import { renderUI } from './render/readingRender.js';
 import { loadReadingExamData } from './api/readingAPI.js';
 import { setUtils } from './utils.js';
 
@@ -9,8 +10,10 @@ async function main() {
     console.log(pageType);
     if(pageType === 'readingExam') {
         await loadReadingExamData();
-        setELReading();
-        renderUI();
+
+        initExam('reading');
+        //setELReading();
+        //renderUI();
     }
 
     if(pageType === 'homepage') {
