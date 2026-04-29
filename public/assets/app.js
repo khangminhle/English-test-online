@@ -4,7 +4,7 @@ import { renderUI } from './render/readingRender.js';
 import { loadReadingExamData } from './api/readingAPI.js';
 import { setUtils } from './utils.js';
 
-async function main() { ( )
+async function main() { 
     const pageType = document.body.dataset.page;
     console.log(pageType);
     if(pageType === 'readingExam') {

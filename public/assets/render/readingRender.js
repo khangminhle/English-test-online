@@ -3,35 +3,13 @@ import { STORAGE_KEYS, APPSTATE, ELEMENTS, BASE_URL } from '../constants.js';
 import { TimerCountDown } from '../jsclass/timer.js';
 export function renderUI() {
 
-    /*
-    const readingTime = 10;
-
-    const timer = new TimerCountDown(readingTime,
-        (timeLeft) => {
-            document.getElementById('timer').innerText = timeLeft;
-        },
-        () => {
-            alert('Hết giờ!');
-        }
-    );
-    
-    timer.start();
-    */
 	displayBtnChoosePassage();
 	displayReadingPassage();
 	displayReadingQuestions();
     displayOldAnswers();
     startExamTime(10);
-    //timeCountDown(10);
-    //displayBtnPauseTime();
     disableTakingExam();
 }
-
-const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-};
 
 function startExamTime(seconds) {
     timeStart(seconds);
@@ -49,8 +27,8 @@ function timeStart(seconds) {
 
     APPSTATE.currentTimer = new TimerCountDown(seconds,
         (timeLeft) => {
-            document.getElementById('timer').innerText = formatTime(timeLeft);
-        },
+            document.getElementById('timer').innerText = APPSTATE.currentTimer.formatTime(timeLeft);
+        }, 
         () => {
             disableTestWhenTimeOut();
         }

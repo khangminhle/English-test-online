@@ -23,7 +23,6 @@ export function setEventListeners() {
 	// set View
 	setPassageView();
 	setQuestionView();
-    console.log('ReadingEvents đã xong!');
 }
 
 // Button tạm dừng time countdown
