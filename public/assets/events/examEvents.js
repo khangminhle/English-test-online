@@ -31,8 +31,25 @@ function setEventListeners(exam, renderer) {
     setBtnPauseTime(exam, renderer);
 }
 
+function saveRemainingTime() {
+    const endTime = Number(STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME));
+    const remaining = endTime - Date.now();
+    STORAGE_KEYS.saveData(STORAGE_KEYS.REMAINING_TIME_PAUSED, String(remaining));
+}
 
+function getRemainingTime() {
+    const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
+    return Math.round(remaining/1000);
+}
 
+function saveEndTime() {
+    // Lấy lại thời gian còn lại đã lưu khi Pause
+    const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
+    // Tính hạn chót mới: Bây giờ + thời gian còn lại
+    const newEndTime = Date.now() + remaining;
+    // Lưu lại hạn chót mới vào Storage
+    STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(newEndTime));
+}
 
 function setBtnPauseTime(exam, renderer) {
     ELEMENTS.btn_pause_time = document.getElementById('btn_pause_time');
@@ -45,24 +62,16 @@ function setBtnPauseTime(exam, renderer) {
         const is_paused = STORAGE_KEYS.getData(STORAGE_KEYS.IS_PAUSED);
 
         if(is_paused === 'false') {
-            
-           
-            const endTime = Number(STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME));
-            const remaining = endTime - Date.now();
-            STORAGE_KEYS.saveData(STORAGE_KEYS.REMAINING_TIME_PAUSED, String(remaining));
+
+            saveRemainingTime();
             // Dừng bài thi
             exam.stop();
             renderer.changeBtnPauseTimeContent('Restart', 'btn-warning', 'btn-success');
         }
         if(is_paused === 'true') {
-            // Lấy lại thời gian còn lại đã lưu khi Pause
-            const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
-            // Tính hạn chót mới: Bây giờ + thời gian còn lại
-            const newEndTime = Date.now() + remaining;
-            // Lưu lại hạn chót mới vào Storage
-            STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(newEndTime));
             // Bắt đầu lại bài thi sau dừng
-            exam.resume(Math.floor(remaining / 1000));
+            saveEndTime();
+            exam.resume(getRemainingTime());
             renderer.changeBtnPauseTimeContent('Pause', 'btn-success', 'btn-warning');
         }
     });

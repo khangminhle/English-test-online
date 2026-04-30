@@ -17,16 +17,8 @@ async function main() {
     if(pageType === 'readingExam') {
         //await loadReadingExamData();
         const exam = new ReadingExam(10, 'data reading!');
-        /*
-        exam.onTimeUpdate((timeLeft) => {
-            // Chỉ ở đây mới xuất hiện logic UI
-            ExamRender.updateTime(timeLeft);
-        });
-        */
-        //ExamRender.renderLayout();
         settingExam(exam, ExamRender);
-        
-        //exam.start();
+
     }
 
     if(pageType === 'homepage') {
