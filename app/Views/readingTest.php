@@ -1,18 +1,9 @@
 <?php require_once(realpath(BASE_PATH. '/app/Views/header.php')); ?>
 
 <!-- Time Counter -->
+<div id="time_area" class="position-fixed top-0 end-0 me-5 p-2 bg-dark text-white rounded shadow"></div>
 
-<div id="time_area" class="position-fixed top-0 end-0 me-5 p-2 bg-dark text-white rounded shadow">
-  <div class="text-center">
-    <small class="d-block text-uppercase fw-bold text-warning">Time left</small>
-    <div id="timer" class="h4 mb-0 fw-bold" style="font-family: monospace;">-:-</div>
-    <div id="num_answers" class="container-fluid" style="text-align: center"></div>
-  </div>
-  <div>
-      <button id="btn_pause_time" class="btn btn-warning">Pause</button>
-  </div>
-  <audio id="audio_end_exam" src="<?php echo BASE_URL;?>assets/audios/bell.mp3"></audio>
-</div>
+<audio id="audio_end_exam" src="<?php echo BASE_URL;?>assets/audios/bell.mp3"></audio>
 
 
 <div class="container-fluid">
