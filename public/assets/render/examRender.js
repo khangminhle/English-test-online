@@ -1,7 +1,9 @@
+import { ELEMENTS } from "../constants.js";
 export class ExamRender {
 
 	static renderLayout() {
 		this.displayTimeArea();
+		this.displayContent();
 		console.log('render exam layout');
 	}
 
@@ -27,6 +29,39 @@ export class ExamRender {
 	  		</div>
 		`;
 		element.innerHTML = html;
+	}
+
+	static displayContent() {
+		let element = document.getElementById('exam_container');
+
+		if(!element) {return;}
+
+		let html = `
+			<div class="row vh-size">
+		        <!-- Cột trái: Reading Passage (chiếm 6/12 cột) -->
+		        <div class="col-md-6 border-end scrollable-column p-4">
+		            <div id='passage_view'></div>
+		        </div>
+
+		        <!-- Cột phải: Questions (chiếm 6/12 cột) -->
+		        <div class="col-md-6 scrollable-column p-4">
+		            <div id="question_view"></div>
+		        </div>
+		    </div>
+		`;
+
+		element.innerHTML = html;
+	}
+
+	static displayReadingPassage(data) {
+		console.log(data);
+	}
+
+	static changeBtnPauseTimeContent(content, oldClass, newClass) {
+		if(!ELEMENTS.btn_pause_time) {return;}
+
+		ELEMENTS.btn_pause_time.innerText = content;
+        ELEMENTS.btn_pause_time.classList.replace(oldClass, newClass);
 	}
 }
 

@@ -6,18 +6,6 @@
 <audio id="audio_end_exam" src="<?php echo BASE_URL;?>assets/audios/bell.mp3"></audio>
 
 
-<div class="container-fluid">
-    <div class="row vh-size">
-        <!-- Cột trái: Reading Passage (chiếm 6/12 cột) -->
-        <div class="col-md-6 border-end scrollable-column p-4">
-            <div id='passage_view'></div>
-        </div>
-
-        <!-- Cột phải: Questions (chiếm 6/12 cột) -->
-        <div class="col-md-6 scrollable-column p-4">
-            <div id="question_view"></div>
-        </div>
-    </div>
-</div>
+<div id="exam_container" class="container-fluid"></div>
 <div id="btns_zone" class="container-fluid"></div>
 <?php require_once(realpath(BASE_PATH. '/app/Views/footer.php')); ?>

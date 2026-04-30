@@ -1,13 +1,15 @@
 import { TimerCountDown } from './timer.js';
-import { ExamRender } from '../render/examRender.js';
 
 export class Exam {
     constructor(durationInSeconds, data) {
         this.examData = data;
         this.duration = durationInSeconds;
+        this.onTimeUpdateCallback = null;
         this.timer = new TimerCountDown(durationInSeconds,
             (timeLeft) => {
-                ExamRender.updateTime(TimerCountDown.formatTime(timeLeft));
+                if (this.onTimeUpdateCallback) {
+                    this.onTimeUpdateCallback(TimerCountDown.formatTime(timeLeft));
+                }
             }, 
             () => {
                 console.log('het gio!');
@@ -15,10 +17,16 @@ export class Exam {
         );
     }
 
-    restart(seconds) {
+    onTimeUpdate(callback) {
+        this.onTimeUpdateCallback = callback;
+    }
+
+    resume(seconds) {
         this.timer = new TimerCountDown(seconds,
             (timeLeft) => {
-                ExamRender.updateTime(TimerCountDown.formatTime(timeLeft));
+                if (this.onTimeUpdateCallback) {
+                    this.onTimeUpdateCallback(timeLeft);
+                }
             }, 
             () => {
                 console.log('het gio!');
@@ -36,9 +44,5 @@ export class Exam {
     stop() {
         // Dừng bài thi
         if(this.timer) {this.timer.stop()};
-    }
-
-    render() {
-        ExamRender.renderLayout();
     }
 }
