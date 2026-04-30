@@ -6,9 +6,9 @@ import { loadReadingExamData } from './api/readingAPI.js';
 //import { setUtils } from './utils.js';
 //import { setGeneralEventListeners } from './events/generalEvents.js';
 import { setGeneralEventListeners } from './events/generalEvents.js';
-import { ReadingExam } from './jsclass/readingExam.js';
-import { setExamEvents } from './events/examEvents.js';
-import { ExamRender } from './render/examRender.js';
+import { ReadingExam } from './jsclass/readingExam.js'; // LOGIC DATA
+import { settingExam } from './events/examEvents.js'; // LOGIC UI
+import { ExamRender } from './render/examRender.js'; // RENDER
 //import { Exam } from './jsclass/exam.js';
 
 async function main() { 
@@ -17,14 +17,16 @@ async function main() {
     if(pageType === 'readingExam') {
         //await loadReadingExamData();
         const exam = new ReadingExam(10, 'data reading!');
+        /*
         exam.onTimeUpdate((timeLeft) => {
             // Chỉ ở đây mới xuất hiện logic UI
             ExamRender.updateTime(timeLeft);
         });
-        ExamRender.renderLayout();
-        setExamEvents(exam, ExamRender);
+        */
+        //ExamRender.renderLayout();
+        settingExam(exam, ExamRender);
         
-        exam.start();
+        //exam.start();
     }
 
     if(pageType === 'homepage') {
