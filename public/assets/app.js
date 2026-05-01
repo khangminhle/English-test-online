@@ -8,7 +8,7 @@ import { loadReadingExamData } from './api/readingAPI.js';
 import { setGeneralEventListeners } from './events/generalEvents.js';
 import { ReadingExam } from './jsclass/readingExam.js'; // LOGIC DATA
 import { settingExam } from './events/examEvents.js'; // LOGIC UI
-import { ExamRender } from './render/examRender.js'; // RENDER
+import { ReadingExamRender } from './render/readingExamRender.js';
 //import { Exam } from './jsclass/exam.js';
 
 async function main() { 
@@ -17,7 +17,7 @@ async function main() {
     if(pageType === 'readingExam') {
         //await loadReadingExamData();
         const exam = new ReadingExam(10, 'data reading!');
-        settingExam(exam, ExamRender);
+        settingExam(exam, ReadingExamRender);
 
     }
 

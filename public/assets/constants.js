@@ -40,8 +40,8 @@ export const APPSTATE = {
 
 export const ELEMENTS = {
     btns_zone: null,
-    passage_view: null,
-    question_view: null,
+    left_view: null,
+    right_view: null,
     btnSwitch: null,
     startBtn: null,
     stopBtn: null,

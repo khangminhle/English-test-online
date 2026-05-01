@@ -10,14 +10,13 @@ export class Exam {
         this.timer = new TimerCountDown(durationInSeconds,
             (timeLeft) => {
                 if(this.onTimeUpdateCallback) {
-                    this.onTimeUpdateCallback(TimerCountDown.formatTime(timeLeft));
-                    console.log(timeLeft, this.timer.timerId);
+                    this.onTimeUpdateCallback(timeLeft);
+                    
                 }
             }, 
             () => {
                 if(this.onTimeFinishCallback) {
                     this.onTimeFinishCallback();
-                    console.log(this.timer.timerId);
                 }
             }
         );
@@ -38,7 +37,7 @@ export class Exam {
         this.timer = new TimerCountDown(seconds,
             (timeLeft) => {
                 if (this.onTimeUpdateCallback) {
-                    this.onTimeUpdateCallback(TimerCountDown.formatTime(timeLeft));
+                    this.onTimeUpdateCallback(timeLeft);
                 }
             }, 
             () => {
@@ -62,7 +61,6 @@ export class Exam {
         if(this.timer) {
             this.timer.stop();
             STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'true');
-            console.log('Đã dừng thi timerid:', this.timer.timerId);
         }
     }
 }

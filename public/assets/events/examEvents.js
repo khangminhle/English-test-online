@@ -18,35 +18,70 @@ export function settingExam(exam, renderer) {
     exam.onTimeFinish(() => {
         alert('Đã xong');
     });
-    exam.start();
-    // Lưu timestamp bắt đầu thi
-    const endTime = Date.now() + (exam.duration * 1000);
-    STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(endTime))
-
     // Khởi tạo những bắt sự kiện
     setEventListeners(exam, renderer);
+    //exam.start();
+    // Lưu timestamp bắt đầu thi
+    //const endTime = Date.now() + (exam.duration * 1000);
+    //STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(endTime))
+    //console.log(localStorage);
+    //saveEndTime(exam.duration);
+    //console.log(localStorage);
+    startExam(exam, renderer);
 }
 
 function setEventListeners(exam, renderer) {
     setBtnPauseTime(exam, renderer);
 }
 
+function isExamRunning() {
+    if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_PAUSED) === 'false') {
+        return true;
+    } else {return false;}
+}
+
+function startExam(exam, renderer) {
+    const remaining = getRemainingTime();
+    if(remaining) {
+        if(isExamRunning()) {
+            saveEndTime();
+            exam.resume(remaining);
+        } else {
+            console.log('stop');
+            renderer.updateTime(remaining);
+            renderer.changeBtnPauseTimeContent('Restart', 'btn-warning', 'btn-success');
+        }
+    } else {
+        saveEndTime(exam.duration);
+        exam.start();
+    }
+}
+
+
+
 function saveRemainingTime() {
-    const endTime = Number(STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME));
-    const remaining = endTime - Date.now();
+    const endTime = STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME);
+    if(!endTime) {return;}
+    const remaining = Number(endTime) - Date.now();
     STORAGE_KEYS.saveData(STORAGE_KEYS.REMAINING_TIME_PAUSED, String(remaining));
 }
 
 function getRemainingTime() {
-    const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
-    return Math.round(remaining/1000);
+    const remaining = STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED);
+    if(!remaining) {return;}
+    return Math.floor(Number(remaining)/1000); // seconds
 }
 
-function saveEndTime() {
+function saveEndTime(durationInSeconds) {
     // Lấy lại thời gian còn lại đã lưu khi Pause
-    const remaining = Number(STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED));
+    const remaining = STORAGE_KEYS.getData(STORAGE_KEYS.REMAINING_TIME_PAUSED);
+    if(!remaining) {
+        const endTime = Date.now() + (durationInSeconds * 1000);
+        STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(endTime))
+        return;
+    }
     // Tính hạn chót mới: Bây giờ + thời gian còn lại
-    const newEndTime = Date.now() + remaining;
+    const newEndTime = Date.now() + Number(remaining);
     // Lưu lại hạn chót mới vào Storage
     STORAGE_KEYS.saveData(STORAGE_KEYS.EXAM_END_TIME, String(newEndTime));
 }

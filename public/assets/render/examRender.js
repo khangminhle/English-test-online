@@ -1,4 +1,6 @@
 import { ELEMENTS } from "../constants.js";
+import { formatTime } from "../utils.js";
+
 export class ExamRender {
 
 	static renderLayout() {
@@ -12,7 +14,7 @@ export class ExamRender {
 
 		if(!element) {return;}
 
-		element.innerText = timeleft;
+		element.innerText = formatTime(timeleft);
 	}
 
 	static displayTimeArea() {
@@ -40,12 +42,12 @@ export class ExamRender {
 			<div class="row vh-size">
 		        <!-- Cột trái: Reading Passage (chiếm 6/12 cột) -->
 		        <div class="col-md-6 border-end scrollable-column p-4">
-		            <div id='passage_view'></div>
+		            <div id='left_view'></div>
 		        </div>
 
 		        <!-- Cột phải: Questions (chiếm 6/12 cột) -->
 		        <div class="col-md-6 scrollable-column p-4">
-		            <div id="question_view"></div>
+		            <div id="right_view"></div>
 		        </div>
 		    </div>
 		`;
@@ -53,11 +55,8 @@ export class ExamRender {
 		element.innerHTML = html;
 	}
 
-	static displayReadingPassage(data) {
-		console.log(data);
-	}
-
 	static changeBtnPauseTimeContent(content, oldClass, newClass) {
+		console.log(ELEMENTS.btn_pause_time);
 		if(!ELEMENTS.btn_pause_time) {return;}
 
 		ELEMENTS.btn_pause_time.innerText = content;
