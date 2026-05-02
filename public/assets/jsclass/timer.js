@@ -23,10 +23,9 @@ export class TimerCountDown {
         }, 1000);
     }
 
-    stop() {
-        console.log('đã stop', this.timerId);
+    stop() {  
         clearInterval(this.timerId);
-        console.log('check đã stop:', this.timerId);
+        this.timerId = null;
     }
 
     static formatTime(seconds) {

@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
     BUTTON_TIME: 'button_time',
     CURRENT_PASSAGE_INDEX: 'current_passage_index',
     IS_PAUSED: 'is_paused',
+    IS_FINISHED: 'is_finished',
     EXAM_END_TIME: 'exam_end_time',
     REMAINING_TIME_PAUSED: 'remaining_time_paused',
 

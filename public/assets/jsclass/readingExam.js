@@ -1,12 +1,7 @@
-import { ExamRender } from "../render/examRender.js";
 import { Exam } from "./exam.js";
-
+import { loadReadingExamData } from "../api/readingAPI.js";
 export class ReadingExam extends Exam {
-	newfunc() {
-		console.log('Reading Exam ne:', this.examData);
-	}
-
-	renderContent() {
-		ExamRender.displayReadingPassage('passage');
+	async loadData() {
+		await loadReadingExamData();
 	}
 }

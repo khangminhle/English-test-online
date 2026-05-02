@@ -1,4 +1,4 @@
-import { ELEMENTS } from "../constants.js";
+import { ELEMENTS, STORAGE_KEYS } from "../constants.js";
 import { formatTime } from "../utils.js";
 
 export class ExamRender {
@@ -18,19 +18,33 @@ export class ExamRender {
 	}
 
 	static displayTimeArea() {
-		let element = document.getElementById('time_area');
+		if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {
+			this.hideTimeArea();
+			return;
+		}
+
+		const element = document.getElementById('time_area');
 		if(!element) {return;}
 		let html = `
-			<div class="text-center">
-	    		<small class="d-block text-uppercase fw-bold text-warning">Time left</small>
-	    		<div id="timer" class="h4 mb-0 fw-bold" style="font-family: monospace;">-:-</div>
-	    		<div id="num_answers" class="container-fluid" style="text-align: center"></div>
-	  		</div>
-	  		<div>
-	  			<button id="btn_pause_time" class="btn btn-warning">Pause</button>
+			<div class="position-fixed top-0 end-0 me-5 p-2 bg-dark text-white rounded shadow">
+				<div class="text-center">
+		    		<small class="d-block text-uppercase fw-bold text-warning">Time left</small>
+		    		<div id="timer" class="h4 mb-0 fw-bold" style="font-family: monospace;">-:-</div>
+		    		<div id="num_answers" class="container-fluid" style="text-align: center"></div>
+		  		</div>
+		  		<div>
+		  			<button id="btn_pause_time" class="btn btn-warning">Pause</button>
+		  		</div>
 	  		</div>
 		`;
 		element.innerHTML = html;
+	}
+
+	static hideTimeArea() {
+		let element = document.getElementById('time_area');
+		if(!element) {return;}
+
+		element.style.display = 'none';
 	}
 
 	static displayContent() {

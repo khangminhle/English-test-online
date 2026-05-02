@@ -3,7 +3,7 @@ import { STORAGE_KEYS } from '../constants.js';
 
 export class Exam {
     constructor(durationInSeconds, data) {
-        this.examData = data;
+        this.data = data;
         this.duration = durationInSeconds;
         this.onTimeUpdateCallback = null;
         this.onTimeFinishCallback = null;
@@ -18,6 +18,7 @@ export class Exam {
                 if(this.onTimeFinishCallback) {
                     this.onTimeFinishCallback();
                 }
+                STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
             }
         );
     }
@@ -44,6 +45,7 @@ export class Exam {
                 if(this.onTimeFinishCallback) {
                     this.onTimeFinishCallback();
                 }
+                STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
             }
         );
         this.start();
@@ -51,6 +53,8 @@ export class Exam {
 
     start() {
         // Bắt đầu bài thi
+        if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {return;}
+
         if(!this.timer) {return;}
         this.timer.start();
         STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'false');
@@ -58,6 +62,8 @@ export class Exam {
 
     stop() {
         // Dừng bài thi
+        if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {return;}
+
         if(this.timer) {
             this.timer.stop();
             STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'true');
