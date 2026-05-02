@@ -16,8 +16,8 @@ async function main() {
     const pageType = document.body.dataset.page;
     console.log(pageType);
     if(pageType === 'readingExam') {
-        const exam = new ReadingExam(10, [APPSTATE.passages, APPSTATE.questions]);
-        exam.loadData();
+        const exam = new ReadingExam(10);
+        await exam.loadData();
         settingExam(exam, ReadingExamRender);
 
     }

@@ -47,6 +47,18 @@ export class ExamRender {
 		element.style.display = 'none';
 	}
 
+    static hideBtnSubmit() {
+    	let element = document.getElementById('btn_submit');
+		if(!element) {return;}
+		element.style.display = 'none';
+    }
+
+    static displayBtnHomepage() {
+    	let element = document.getElementById('btn_done');
+		if(!element) {return;}
+		element.style.display = 'inline-block';
+    }
+
 	static displayContent() {
 		let element = document.getElementById('exam_container');
 
@@ -76,5 +88,15 @@ export class ExamRender {
 		ELEMENTS.btn_pause_time.innerText = content;
         ELEMENTS.btn_pause_time.classList.replace(oldClass, newClass);
 	}
+
+	static playSoundEndExam() {
+	    let audio = document.getElementById('audio_end_exam');
+
+	    if(audio) {
+	        audio.play().catch(error => {
+		        console.error("Lỗi phát âm thanh:", error);
+		    });
+    	}
+    }
 }
 

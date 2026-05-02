@@ -24,8 +24,10 @@ export class TimerCountDown {
     }
 
     stop() {  
-        clearInterval(this.timerId);
-        this.timerId = null;
+        if(this.timerId) {
+            clearInterval(this.timerId);
+            this.timerId = null;
+        }
     }
 
     static formatTime(seconds) {

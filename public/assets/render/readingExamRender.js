@@ -8,6 +8,8 @@ export class ReadingExamRender extends ExamRender {
 		const readingPassages = STORAGE_KEYS.getData(STORAGE_KEYS.PASSAGES);
 		ELEMENTS.left_view = document.getElementById('left_view');
 
+		console.log(readingPassages, ELEMENTS.left_view);
+
 		if(!readingPassages) {return;}
 		if(!ELEMENTS.left_view) {return;}
 
@@ -95,6 +97,19 @@ export class ReadingExamRender extends ExamRender {
 	    html += `</div>`;
 
 	    ELEMENTS.right_view.innerHTML = html;
-		}
+	}
+
+	static displayOldAnswers() {
+	    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
+	    if(answered) {
+	        for(let ans in answered) {
+	            let id_ans = ans + answered[ans];
+	            const element = document.querySelector(`input[data-id="${id_ans}"]`);
+	            if (element) {
+	                element.checked = true;
+	            }
+	        }
+	    }
+	}
 }
 
