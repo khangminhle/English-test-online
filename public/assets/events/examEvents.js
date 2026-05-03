@@ -305,6 +305,8 @@ function getUserIncorrectAnswers() {
     return userIncorrectAnswers;
 }
 
+/*
+
 function getUserCorrectAnswers() {
     let correctAnswers = getCorrectAnswers();
     let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
@@ -334,7 +336,7 @@ function getNotAnsweredQuestions() {
 
     return notAnswerList;
 }
-
+*/
 function goToHomepage() {
     Swal.fire({
         title: 'Bạn có chắc chắn muốn về trang chủ',

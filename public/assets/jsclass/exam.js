@@ -72,5 +72,70 @@ export class Exam {
         }
     }
 
-    
+    getCorrectAnswers() {
+
+        const readingQuestions = this.data['questions'];
+        if(!readingQuestions) {return;}
+
+        const correctAnswers = [];
+        for(let rp_id in readingQuestions) {
+            const rp_questions = readingQuestions[rp_id]['qna'];
+            for(let i in rp_questions) {
+                correctAnswers.push(rp_questions[i]['answer']);
+            }
+        }
+
+        // 1. Tạo bản đồ chuyển đổi
+        const mapping = {
+            '1': 'A',
+            '2': 'B',
+            '3': 'C',
+            '4': 'D'
+        };
+
+        
+        let mappedCorrectAnswers = correctAnswers.map(item => mapping[item] || item);
+        const result = Object.fromEntries(
+            mappedCorrectAnswers.map((val, index) => [(index + 1).toString(), val])
+        );
+        return result;
+    }
+
+    getUserIncorrectAnswers() {
+        const correctAnswers = getCorrectAnswers();
+        const userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
+
+        if(!correctAnswers) {return;}
+        if(!userAnswers) {return;}
+        
+
+        const userIncorrectAnswers = [];
+
+        for(let i in userAnswers) {
+            if(userAnswers[i] !== correctAnswers[i]) {
+                userIncorrectAnswers.push(i+userAnswers[i]);
+            }
+        }
+
+        return userIncorrectAnswers;
+    }
+
+    getUserCorrectAnswers() {
+        const correctAnswers = getCorrectAnswers();
+        const userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
+
+        if(!correctAnswers) {return;}
+        if(!userAnswers) {return;}
+
+        const userCorrectAnswers = [];
+
+        for(let i in userAnswers) {
+            if(userAnswers[i] === correctAnswers[i]) {
+                userCorrectAnswers.push(i+userAnswers[i]);
+            }
+        }
+
+        return userCorrectAnswers;
+    }
+
 }

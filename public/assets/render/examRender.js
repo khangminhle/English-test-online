@@ -182,16 +182,6 @@ export class ExamRender {
         ELEMENTS.btn_pause_time.classList.replace(oldClass, newClass);
 	}
 
-	playSoundEndExam() {
-	    let audio = document.getElementById('audio_end_exam');
-
-	    if(audio) {
-	        audio.play().catch(error => {
-		        console.error("Lỗi phát âm thanh:", error);
-		    });
-    	}
-    }
-
     displayLeftContent(html) {
     	ELEMENTS.left_view = document.getElementById('left_view');
     	if(!ELEMENTS.left_view) {return;}
