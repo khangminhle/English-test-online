@@ -2,8 +2,8 @@ import { TimerCountDown } from './timer.js';
 import { STORAGE_KEYS } from '../constants.js';
 
 export class Exam {
-    constructor(durationInSeconds, data) {
-        this.data = data;
+    constructor(durationInSeconds) {
+        this.data = null;
         this.duration = durationInSeconds;
         this.onTimeUpdateCallback = null;
         this.onTimeFinishCallback = null;
@@ -71,4 +71,6 @@ export class Exam {
             STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'true');
         }
     }
+
+    
 }

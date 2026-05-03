@@ -66,7 +66,7 @@ function changeExamToFinish() {
 function disableTestWhenTimeOut(exam, renderer) {
     //if(isExamFinished()) {return;}
 
-    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
+    const answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
 
     if(!answered) {
         // Popup khi người dùng chưa làm câu nào
@@ -77,8 +77,8 @@ function disableTestWhenTimeOut(exam, renderer) {
         return;
     }
 
-    let totalQuestions = Object.keys(getCorrectAnswers()).length;
-    let totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
+    const totalQuestions = Object.keys(getCorrectAnswers()).length;
+    const totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
 
     changeExamToFinish();
     disableTakingExam(exam, renderer);
@@ -114,14 +114,12 @@ function startExam(exam, renderer) {
         saveEndTime(exam.duration);
         exam.start();
     } else {
-        const remaining = getRemainingTime();
-
         if(isExamRunning()) {
             saveRemainingTime();
             saveEndTime();
             exam.resume(getRemainingTime());
         } else {
-            renderer.updateTime(remaining);
+            renderer.updateTime(getRemainingTime());
             renderer.changeBtnPauseTimeContent('Restart', 'btn-warning', 'btn-success');
         }
     }
@@ -194,7 +192,7 @@ function setRadioChooseQuestion() {
         const btn = e.target.closest('.choose-question');
         if(btn) {
             let q_id = btn.dataset.id;
-            chooseAnswer(q_id);
+            saveUserAsnwers(q_id);
         }
     });
 }
@@ -239,41 +237,9 @@ function setBtnChoosePassage(exam, renderer) {
                 console.log('');
         }
     });
-
-    /*
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        const btn = e.target.closest('.btn-choose-passage');
-
-        console.log(btn.classList.value);
-
-        if(btn) {
-            let rp_id = btn.dataset.id;
-            STORAGE_KEYS.saveData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX, rp_id);
-            renderViewChoosePassage(rp_id, exam, renderer);
-        }
-    });
-    
-
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        const btn = e.target.closest('#btn_submit');
-        //console.log(e.target);
-        if(btn) {
-            submitTest(exam, renderer);
-        }
-    });
-
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        //console.log(e.target);
-        const btn = e.target.closest('#btn_done');
-        //console.log(btn.id);
-        console.log(btn.id);
-        if(btn) {goToHomepage();}
-    });
-    */
-    
 }
 
-function chooseAnswer(user_ans) {
+function saveUserAsnwers(user_ans) {
     let result = user_ans.match(/(\d+)([a-zA-Z]+)/);
 
     // Tách câu trả lời thành số thứ tự câu hỏi và câu trả lời A, B, C, D

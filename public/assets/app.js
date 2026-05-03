@@ -10,9 +10,12 @@ async function main() {
     if(pageType === 'readingExam') {
         const exam = new ReadingExam(10);
         await exam.loadData();
-        //console.log('exam:', exam.data);
-        settingExam(exam, new ReadingExamRender(exam.data));
-
+        if(exam.checkValidData()) {
+            console.log('Data hợp lệ!');
+            settingExam(exam, new ReadingExamRender(exam.data));
+        } else {
+            console.log('Data không hợp lệ!');
+        }
     }
 
     if(pageType === 'homepage') {

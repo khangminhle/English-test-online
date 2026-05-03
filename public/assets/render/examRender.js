@@ -5,7 +5,7 @@ export class ExamRender {
 
 	renderLayout() {
 		this.displayTimeArea();
-		this.displayContent();
+		this.displayContentArea();
 	}
 
 	disableUserChoice() {
@@ -152,7 +152,7 @@ export class ExamRender {
 		element.style.display = 'inline-block';
     }
 
-	displayContent() {
+	displayContentArea() {
 		let element = document.getElementById('exam_container');
 
 		if(!element) {return;}
