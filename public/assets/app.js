@@ -2,7 +2,8 @@ import { setEventListeners as setELHomepage} from './events/homeEvents.js';
 import { setGeneralEventListeners } from './events/generalEvents.js';
 import { ReadingExam } from './jsclass/readingExam.js'; // LOGIC DATA
 import { ReadingExamRender } from './render/readingExamRender.js'; // RENDER
-import { settingExam } from './events/examEvents.js'; // LOGIC UI
+//import { settingExam } from './events/examEvents.js'; // LOGIC UI
+import { ExamController } from './controllers/examController.js';
 
 async function main() { 
     const pageType = document.body.dataset.page;
@@ -12,7 +13,11 @@ async function main() {
         await exam.loadData();
         if(exam.checkValidData()) {
             console.log('Data hợp lệ!');
-            settingExam(exam, new ReadingExamRender(exam.data));
+
+            const examController = new ExamController(exam, new ReadingExamRender(exam.data));
+
+            examController.settingExam();
+            //settingExam(exam, new ReadingExamRender(exam.data));
         } else {
             console.log('Data không hợp lệ!');
         }

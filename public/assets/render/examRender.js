@@ -78,7 +78,7 @@ export class ExamRender {
 	popupNotAnswers(html) {
 		Swal.fire({
             title: 'Các câu bạn chưa làm:',
-            html: popupHTML,
+            html: html,
             icon: 'warning',
             confirmButtonText: 'Tôi đã rõ !',
             confirmButtonColor: '#3085d6',

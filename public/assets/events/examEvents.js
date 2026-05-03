@@ -10,9 +10,9 @@ export function settingExam(exam, renderer) {
     // Khởi tạo giao diện thi
     renderer.renderLayout()
     // Khởi tạo thực thi hàm mỗi giây
-    updateTimeEverySeconds(exam, renderer);
+    updateTimeEverySeconds(exam);
     // Khởi tạo thực thi hàm khi kết thúc
-    setActionOnTimeFinish(exam, renderer);
+    setActionOnTimeFinish(exam);
     // Khởi tạo những bắt sự kiện
     setEventListeners(exam, renderer);
 
@@ -22,13 +22,13 @@ export function settingExam(exam, renderer) {
     renderInitialView(exam, renderer);
 }
 
-function updateTimeEverySeconds(exam, renderer) {
+function updateTimeEverySeconds(exam) {
     exam.onTimeUpdate((timeLeft) => {
         renderer.updateTime(timeLeft);
     });
 }
 
-function setActionOnTimeFinish(exam, renderer) {
+function setActionOnTimeFinish(exam) {
     exam.onTimeFinish(() => {
         disableTestWhenTimeOut(exam, renderer);
         changeExamToFinish();
@@ -66,7 +66,7 @@ function changeExamToFinish() {
 function disableTestWhenTimeOut(exam, renderer) {
     //if(isExamFinished()) {return;}
 
-    const answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
+    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
 
     if(!answered) {
         // Popup khi người dùng chưa làm câu nào
@@ -77,8 +77,8 @@ function disableTestWhenTimeOut(exam, renderer) {
         return;
     }
 
-    const totalQuestions = Object.keys(getCorrectAnswers()).length;
-    const totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
+    let totalQuestions = Object.keys(getCorrectAnswers()).length;
+    let totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
 
     changeExamToFinish();
     disableTakingExam(exam, renderer);
@@ -114,12 +114,14 @@ function startExam(exam, renderer) {
         saveEndTime(exam.duration);
         exam.start();
     } else {
+        const remaining = getRemainingTime();
+
         if(isExamRunning()) {
             saveRemainingTime();
             saveEndTime();
             exam.resume(getRemainingTime());
         } else {
-            renderer.updateTime(getRemainingTime());
+            renderer.updateTime(remaining);
             renderer.changeBtnPauseTimeContent('Restart', 'btn-warning', 'btn-success');
         }
     }
@@ -192,7 +194,7 @@ function setRadioChooseQuestion() {
         const btn = e.target.closest('.choose-question');
         if(btn) {
             let q_id = btn.dataset.id;
-            saveUserAsnwers(q_id);
+            chooseAnswer(q_id);
         }
     });
 }
@@ -234,12 +236,44 @@ function setBtnChoosePassage(exam, renderer) {
                 renderViewChoosePassage(rp_id, exam, renderer);
                 break;
             default:
-                console.log('');
+                console.log()
         }
     });
+
+    /*
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-choose-passage');
+
+        console.log(btn.classList.value);
+
+        if(btn) {
+            let rp_id = btn.dataset.id;
+            STORAGE_KEYS.saveData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX, rp_id);
+            renderViewChoosePassage(rp_id, exam, renderer);
+        }
+    });
+    
+
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        const btn = e.target.closest('#btn_submit');
+        //console.log(e.target);
+        if(btn) {
+            submitTest(exam, renderer);
+        }
+    });
+
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        //console.log(e.target);
+        const btn = e.target.closest('#btn_done');
+        //console.log(btn.id);
+        console.log(btn.id);
+        if(btn) {goToHomepage();}
+    });
+    */
+    
 }
 
-function saveUserAsnwers(user_ans) {
+function chooseAnswer(user_ans) {
     let result = user_ans.match(/(\d+)([a-zA-Z]+)/);
 
     // Tách câu trả lời thành số thứ tự câu hỏi và câu trả lời A, B, C, D
@@ -305,8 +339,6 @@ function getUserIncorrectAnswers() {
     return userIncorrectAnswers;
 }
 
-/*
-
 function getUserCorrectAnswers() {
     let correctAnswers = getCorrectAnswers();
     let userAnswers = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
@@ -336,7 +368,7 @@ function getNotAnsweredQuestions() {
 
     return notAnswerList;
 }
-*/
+
 function goToHomepage() {
     Swal.fire({
         title: 'Bạn có chắc chắn muốn về trang chủ',
