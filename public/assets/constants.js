@@ -1,11 +1,8 @@
 export const STORAGE_KEYS = {
     THEME: 'theme',
     USER_ANSWERS: 'answered',
-    SUBMITTED: 'submitted',
     PASSAGES: 'passages',
     QUESTIONS: 'questions',
-    TIMELEFT: 'timeleft',
-    BUTTON_TIME: 'button_time',
     CURRENT_PASSAGE_INDEX: 'current_passage_index',
     IS_PAUSED: 'is_paused',
     IS_FINISHED: 'is_finished',
@@ -30,13 +27,6 @@ export const STORAGE_KEYS = {
             return data;
         }
     }
-};
-
-export const APPSTATE = {
-    passages: null,
-    questions: null,
-    intervalCountDown: null,
-    currentTimer: null
 };
 
 export const ELEMENTS = {

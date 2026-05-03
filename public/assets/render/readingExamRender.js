@@ -3,85 +3,55 @@ import { ExamRender } from "./examRender.js";
 
 export class ReadingExamRender extends ExamRender {
 
-	static displayPassage(rp_number='rp1') {
+	constructor(readingData) {
+		super();
+		this.passages = readingData['passages'];
+		this.questions = readingData['questions'];
+	}
 
-		const readingPassages = STORAGE_KEYS.getData(STORAGE_KEYS.PASSAGES);
-		ELEMENTS.left_view = document.getElementById('left_view');
+	getHTMLReadingPassages(rp_number='rp1') {
 
-		console.log(readingPassages, ELEMENTS.left_view);
+		const readingPassages = this.passages;
+		if(!readingPassages) {return '';}
 
-		if(!readingPassages) {return;}
-		if(!ELEMENTS.left_view) {return;}
-
-		let current_passage_index = STORAGE_KEYS.getData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX);
-	    console.log('Passage:', current_passage_index);
+		const current_passage_index = STORAGE_KEYS.getData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX);
 	    if(current_passage_index) {
 	        rp_number = current_passage_index;
 	    }
 
-	    let filter_text = readingPassages[rp_number].replaceAll('<u>','<b>').replaceAll('</u>', '</b>');
-	    let rp1_paragraphs = filter_text.split('\n');
+	    const filter_text = readingPassages[rp_number].replaceAll('<u>','<b>').replaceAll('</u>', '</b>');
+	    const rp1_paragraphs = filter_text.split('\n');
 
 	    let html = `<h4>${rp1_paragraphs[0]}</h4>`;
 	    for(let i = 1; i < rp1_paragraphs.length; i++) {
 	        html += `<p>${rp1_paragraphs[i]}</p>`;
 	    }
 
-	    ELEMENTS.left_view.innerHTML = html;
+		return html;
 	}
+	getHTMLQuestions(rp_number='rp1') {
+		const readingQuestions = this.questions;//STORAGE_KEYS.getData(STORAGE_KEYS.QUESTIONS);
 
-	static displayBtnChoosePassage() {
-		const readingPassages = STORAGE_KEYS.getData(STORAGE_KEYS.PASSAGES);
-		if(!readingPassages) {return;}
-		ELEMENTS.btns_zone = document.getElementById('btns_zone');
-		if(!ELEMENTS.btns_zone) {return;}
+		if(!readingQuestions) {return '';}
 
-	    let html = `<div class="d-flex justify-content-center">`;
-	    for(let rp_number in readingPassages) {
-	        //html += `<div class="col-1 d-flex justify-content-center">`;
-	        html += `<button type="button" class="btn btn-primary ms-2 btn-choose-passage" data-id="${rp_number}">Passage ${rp_number.replace('rp','')}</button>`;
-	        //html += `</div>`;
-	    }
-	    //html += `<div class="col-1 d-flex justify-content-center">`
-	    html += `<button type="button" class="btn btn-success ms-4" id="btn_submit">Submit</button>`;
-	    //html += `</div>`;
-	    //html += `<div class="col-1 d-flex justify-content-center">`
-	    html += `<button style="display:none" type="button" class="btn btn-danger ms-4" id="btn_done">Homepage</button>`;
-	    //html += `</div>`;
-	    html += `</div>`;
-
-	    ELEMENTS.btns_zone.innerHTML = html;
-	}
-
-	static displayQuestions(rp_number='rp1') {
-		const readingQuestions = STORAGE_KEYS.getData(STORAGE_KEYS.QUESTIONS);
-		ELEMENTS.right_view = document.getElementById('right_view');
-
-		if(!readingQuestions) {return;}
-		if(!ELEMENTS.right_view) {return;}
-
-		let current_passage_index = STORAGE_KEYS.getData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX);
+		const current_passage_index = STORAGE_KEYS.getData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX);
 	    if(current_passage_index) {
 	        rp_number = current_passage_index;
 	    }
 
-
-	    let rp_questions = readingQuestions[rp_number]['qna'];
+	    const rp_questions = readingQuestions[rp_number]['qna'];
 
 	    let html = `<h3>Questions</h3>`;
 	    html += `<div>`
 
-	    let index = Number(rp_number.replace('rp',''));
-	    let len = index * 10;
-
-	    console.log('index:', index);
+	    const index = Number(rp_number.replace('rp',''));
 
 	    for(let i = 0; i < rp_questions.length; i++) {
 	        html += `<div class="mt-4">`;
-	        let content = rp_questions[i]['content'].replaceAll('<u>', '<b>').replaceAll('</u>', '</b>');
+	        const content = rp_questions[i]['content'].replaceAll('<u>', '<b>').replaceAll('</u>', '</b>');
 	        //console.log(content);
 	        html += `<p>${content}</p>`;
-	        let ans = ['A', 'B', 'C', 'D'];
+	        const ans = ['A', 'B', 'C', 'D'];
 	        for(let j = 0; j < ans.length; j++) {
 	            let q_content =  rp_questions[i][ans[j]];
 	            if(q_content.includes('<b>')) {
@@ -96,20 +66,21 @@ export class ReadingExamRender extends ExamRender {
 	    }
 	    html += `</div>`;
 
-	    ELEMENTS.right_view.innerHTML = html;
+	    return html;
 	}
+	getHTMLBtnChoosePassages() {
+		const readingPassages = this.passages;
+		if(!readingPassages) {return '';}
 
-	static displayOldAnswers() {
-	    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
-	    if(answered) {
-	        for(let ans in answered) {
-	            let id_ans = ans + answered[ans];
-	            const element = document.querySelector(`input[data-id="${id_ans}"]`);
-	            if (element) {
-	                element.checked = true;
-	            }
-	        }
+		let html = `<div class="d-flex justify-content-center">`;
+	    for(let rp_number in readingPassages) {
+	        html += `<button type="button" class="btn btn-primary ms-2" data-action="choose-passage" data-id="${rp_number}">Passage ${rp_number.replace('rp','')}</button>`;
 	    }
+	    html += `<button type="button" class="btn btn-success ms-4" data-action="submit" id="btn_submit">Submit</button>`;
+	    html += `<button style="display:none" type="button" class="btn btn-danger ms-4" data-action="go-to-home-page" id="btn_done">Homepage</button>`;
+	    html += `</div>`;
+
+	    return html;
 	}
 }
 

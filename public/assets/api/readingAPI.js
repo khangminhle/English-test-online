@@ -1,10 +1,10 @@
-import { STORAGE_KEYS, APPSTATE, BASE_URL } from '../constants.js';
+import { STORAGE_KEYS, BASE_URL } from '../constants.js';
 
 export async function loadReadingExamData() {
     try {
 
-        let ls_passages = STORAGE_KEYS.getData(STORAGE_KEYS.PASSAGES);
-        let ls_questions = STORAGE_KEYS.getData(STORAGE_KEYS.QUESTIONS);
+        const ls_passages = STORAGE_KEYS.getData(STORAGE_KEYS.PASSAGES);
+        const ls_questions = STORAGE_KEYS.getData(STORAGE_KEYS.QUESTIONS);
 
         if(ls_passages === null || ls_questions === null) {
             console.log('Lấy dữ liệu');
@@ -13,17 +13,19 @@ export async function loadReadingExamData() {
             
             const data = await response.json();
             
-            //console.log(data);
+            STORAGE_KEYS.saveData(STORAGE_KEYS.PASSAGES, JSON.parse(data['passages']));
+            STORAGE_KEYS.saveData(STORAGE_KEYS.QUESTIONS, JSON.parse(data['questions']));
 
-            APPSTATE.passages = JSON.parse(data['passages']);
-            APPSTATE.questions = JSON.parse(data['questions']);
-
-            STORAGE_KEYS.saveData(STORAGE_KEYS.PASSAGES, APPSTATE.passages);
-            STORAGE_KEYS.saveData(STORAGE_KEYS.QUESTIONS, APPSTATE.questions);
-        } else {
-            APPSTATE.passages = ls_passages;
-            APPSTATE.questions = ls_questions;
+            return {
+                'passages': JSON.parse(data['passages']),
+                'questions': JSON.parse(data['questions'])
+            };
         }
+
+        return {
+            'passages': ls_passages,
+            'questions': ls_questions
+        };
     } catch (error) {
         console.error("Không lấy được dữ liệu:", error);
     }

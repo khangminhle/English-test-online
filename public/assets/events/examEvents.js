@@ -9,31 +9,43 @@ import { STORAGE_KEYS, ELEMENTS, BASE_URL } from '../constants.js';
 export function settingExam(exam, renderer) {
     // Khởi tạo giao diện thi
     renderer.renderLayout()
-    //setBtnPauseTime(exam, renderer);
     // Khởi tạo thực thi hàm mỗi giây
-    exam.onTimeUpdate((timeLeft) => {
-        renderer.updateTime(timeLeft);
-    });
+    updateTimeEverySeconds(exam, renderer);
     // Khởi tạo thực thi hàm khi kết thúc
-    exam.onTimeFinish(() => {
-        disableTestWhenTimeOut();
-    });
+    setActionOnTimeFinish(exam, renderer);
     // Khởi tạo những bắt sự kiện
     setEventListeners(exam, renderer);
+
     // Bắt đầu bài thi
     startExam(exam, renderer);
 
+    renderInitialView(exam, renderer);
+}
+
+function updateTimeEverySeconds(exam, renderer) {
+    exam.onTimeUpdate((timeLeft) => {
+        renderer.updateTime(timeLeft);
+    });
+}
+
+function setActionOnTimeFinish(exam, renderer) {
+    exam.onTimeFinish(() => {
+        disableTestWhenTimeOut(exam, renderer);
+        changeExamToFinish();
+    });
+}
+
+function renderInitialView(exam, renderer) {
     // Hiển thị nút chọn bài đọc
-    renderer.displayBtnChoosePassage();
+    renderer.displayButtonsZone(renderer.getHTMLBtnChoosePassages());
     // Hiển thị bài đọc
-    renderer.displayPassage();
+    renderer.displayLeftContent(renderer.getHTMLReadingPassages());
     // Hiển thị câu hỏi
-    renderer.displayQuestions();
+    renderer.displayRightContent(renderer.getHTMLQuestions());
     // Hiển thị những câu hỏi đã trả lời (nếu có)
     renderer.displayOldAnswers();
     // Vô hiệu hóa bài thi nếu đã submit hay hết giờ
     disableTakingExam(exam, renderer);
-    //console.log(getCorrectAnswers());
 }
 
 function setEventListeners(exam, renderer) {
@@ -43,80 +55,55 @@ function setEventListeners(exam, renderer) {
 }
 
 
+function isExamFinished() {
+    return STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true';
+}
 
-function disableUserChoice() {
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.disabled = true;
-    });
+function changeExamToFinish() {
+    STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
 }
 
 function disableTestWhenTimeOut(exam, renderer) {
+    //if(isExamFinished()) {return;}
+
     let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
 
     if(!answered) {
         // Popup khi người dùng chưa làm câu nào
-        Swal.fire({
-            title: 'Bạn chưa làm câu hỏi nào !',
-            icon: 'error',
-            confirmButtonText: 'Tôi đã rõ !',
-            confirmButtonColor: '#3085d6',
-            backdrop: true, // Hiệu ứng làm mờ nền
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
-            }
-        });
-
-        STORAGE_KEYS.saveData(STORAGE_KEYS.SUBMITTED, 'true');
+        renderer.popupNoAnswer();
+        changeExamToFinish();
         disableTakingExam(exam, renderer);
         renderer.playSoundEndExam();
         return;
     }
 
-
-    let num_answers = Object.keys(answered).length;
     let totalQuestions = Object.keys(getCorrectAnswers()).length;
     let totalCorrectQuestions = Object.keys(getUserCorrectAnswers()).length;
 
-    Swal.fire({
-        title: 'Hết thời gian !',
-        text: `Bạn đã làm đúng: ${totalCorrectQuestions}/${totalQuestions} câu`,
-        icon: 'success',
-        confirmButtonText: 'Tôi đã rõ !',
-        confirmButtonColor: '#3085d6',
-        backdrop: true, // Hiệu ứng làm mờ nền
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
-        }
-    });
-
-    STORAGE_KEYS.saveData(STORAGE_KEYS.SUBMITTED, 'true');
+    changeExamToFinish();
     disableTakingExam(exam, renderer);
+    renderer.popupCorrectAnswers(totalCorrectQuestions, totalQuestions);
     renderer.playSoundEndExam();
 }
 
 function disableTakingExam(exam, renderer) {
-    if(STORAGE_KEYS.getData(STORAGE_KEYS.SUBMITTED) === 'true') {
+    if(isExamFinished()) {
         exam.stop();
-        STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
-        disableUserChoice();
-        showIncorrectAnswers();
-        showCorrectAnswers();
+        renderer.disableUserChoice();
+        renderer.showIncorrectAnswers(getUserIncorrectAnswers());
+        renderer.showCorrectAnswers(getCorrectAnswers(), getUserCorrectAnswers());
         renderer.hideTimeArea();
         renderer.hideBtnSubmit();
-        renderer.displayBtnHomepage();//document.getElementById('btn_submit').style.display = 'none';
-        //document.getElementById('btn_done').style.display = 'inline';   
+        renderer.displayBtnHomepage();
     }
 }
 
 function isExamRunning() {
-    if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_PAUSED) === 'false') {
-        return true;
-    } else {return false;}
+    return STORAGE_KEYS.getData(STORAGE_KEYS.IS_PAUSED) === 'false';
 }
 
 function doesEndTimeExist() {
-    if(STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME)) {return true;}
-    return false;
+    return Boolean(STORAGE_KEYS.getData(STORAGE_KEYS.EXAM_END_TIME));
 }
 
 function startExam(exam, renderer) {
@@ -124,19 +111,16 @@ function startExam(exam, renderer) {
     const endTime = doesEndTimeExist();
 
     if(!endTime) {
-        console.log('Khởi tạo ban đầu endTime');
         saveEndTime(exam.duration);
         exam.start();
     } else {
-        let remaining = getRemainingTime();
+        const remaining = getRemainingTime();
 
         if(isExamRunning()) {
-            console.log('Nút pause - tiếp tục chạy resume');
             saveRemainingTime();
             saveEndTime();
             exam.resume(getRemainingTime());
         } else {
-            console.log('Nút restart - dừng và updateTime')
             renderer.updateTime(remaining);
             renderer.changeBtnPauseTimeContent('Restart', 'btn-warning', 'btn-success');
         }
@@ -181,12 +165,11 @@ function setBtnPauseTime(exam, renderer) {
     if(!ELEMENTS.btn_pause_time) {return;}
 
     // Gắn sự kiện
-    btn_pause_time.addEventListener('click', () => {
+    ELEMENTS.btn_pause_time.addEventListener('click', () => {
 
         const is_paused = STORAGE_KEYS.getData(STORAGE_KEYS.IS_PAUSED);
 
         if(is_paused === 'false') {
-
             saveRemainingTime();
             // Dừng bài thi
             exam.stop();
@@ -201,6 +184,7 @@ function setBtnPauseTime(exam, renderer) {
     });
 }
 
+// FUNCTIONS EVENT LISTENERS
 function setRadioChooseQuestion() {
 
     ELEMENTS.right_view = document.getElementById('right_view');
@@ -208,12 +192,85 @@ function setRadioChooseQuestion() {
 
     ELEMENTS.right_view.addEventListener('click', (e) => {
         const btn = e.target.closest('.choose-question');
-
         if(btn) {
             let q_id = btn.dataset.id;
             chooseAnswer(q_id);
         }
     });
+}
+
+function renderViewChoosePassage(rp_id, exam, renderer) {
+    // Hiển thị bài đọc
+    renderer.displayLeftContent(renderer.getHTMLReadingPassages(rp_id));
+    // Hiển thị câu hỏi
+    renderer.displayRightContent(renderer.getHTMLQuestions(rp_id));
+    renderer.displayOldAnswers();
+    disableTakingExam(exam, renderer);
+}
+
+function setBtnChoosePassage(exam, renderer) {
+    ELEMENTS.btns_zone = document.getElementById('btns_zone');
+
+    if(!ELEMENTS.btns_zone) {return;}
+
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        //const btn = e.target.closest('.btn-choose-passage, #btn_submit, #btn_done');
+        const btn = e.target.closest('[data-action]');
+    
+        if(!btn) {return};
+
+    // Lấy hành động cần thực hiện
+        const action = btn.dataset.action;
+        switch (action) { // Nếu là nút chọn bài thì ta đặt ID ảo hoặc check class
+            case 'submit':
+                submitTest(exam, renderer);
+                break;
+
+            case 'go-to-home-page':
+                goToHomepage();
+                break;
+
+            case 'choose-passage':
+                const rp_id = btn.dataset.id;
+                STORAGE_KEYS.saveData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX, rp_id);
+                renderViewChoosePassage(rp_id, exam, renderer);
+                break;
+            default:
+                console.log('');
+        }
+    });
+
+    /*
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-choose-passage');
+
+        console.log(btn.classList.value);
+
+        if(btn) {
+            let rp_id = btn.dataset.id;
+            STORAGE_KEYS.saveData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX, rp_id);
+            renderViewChoosePassage(rp_id, exam, renderer);
+        }
+    });
+    
+
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        const btn = e.target.closest('#btn_submit');
+        //console.log(e.target);
+        if(btn) {
+            submitTest(exam, renderer);
+        }
+    });
+
+    ELEMENTS.btns_zone.addEventListener('click', (e) => {
+        //console.log(e.target);
+        const btn = e.target.closest('#btn_done');
+        //console.log(btn.id);
+        console.log(btn.id);
+        if(btn) {goToHomepage();}
+    });
+    */
+    
 }
 
 function chooseAnswer(user_ans) {
@@ -231,8 +288,6 @@ function chooseAnswer(user_ans) {
 
     answered[q_id] = ans;
     STORAGE_KEYS.saveData(STORAGE_KEYS.USER_ANSWERS, answered);
-
-    console.log(answered);
 }
 
 function getCorrectAnswers() {
@@ -302,45 +357,6 @@ function getUserCorrectAnswers() {
     return userCorrectAnswers;
 }
 
-function showIncorrectAnswers() {
-    let incorrectAnswers = getUserIncorrectAnswers(); // Lấy những đáp án sai
-
-    if(!incorrectAnswers) {return;}
- 
-    for(let i in incorrectAnswers) {
-        let id = 'lb' + incorrectAnswers[i];
-        //console.log(id);
-
-        const element = document.querySelector(`label[data-id="${id}"]`);
-
-        if (element) {
-            element.classList.add('text-danger', 'fw-bold');
-        }
-    }
-    
-}
-
-function showCorrectAnswers() {
-    let correctAnswers = getCorrectAnswers(); // Lấy những đáp án đúng
-    let userCorrectAnswers = getUserCorrectAnswers() // Lấy đáp án đúng của user
-    if(!correctAnswers) {return;}
-    if(!userCorrectAnswers) {return;}
- 
-    for(let i in correctAnswers) {
-        let id = `lb${i}${correctAnswers[i]}`;
-
-        const element = document.querySelector(`label[data-id="${id}"]`);
-
-        if (element) {
-            if(userCorrectAnswers.includes(id.replace('lb',''))) {
-                element.classList.add('text-success', 'fw-bold');
-            } else {
-                element.classList.add('text-success');
-            }
-        }
-
-    }
-}
 
 function getNotAnsweredQuestions() {
     let userAnsweredQuestions = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS);
@@ -348,52 +364,12 @@ function getNotAnsweredQuestions() {
     if(!userAnsweredQuestions) {return;}
 
     let correctAnswers = getCorrectAnswers();
-
     const notAnswerList = Object.keys(correctAnswers).filter(key => !userAnsweredQuestions.hasOwnProperty(key));
 
     return notAnswerList;
 }
 
-function setBtnChoosePassage(exam, renderer) {
-    ELEMENTS.btns_zone = document.getElementById('btns_zone');
-
-    if(!ELEMENTS.btns_zone) {return;}
-
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        const btn = e.target.closest('.btn-choose-passage');
-
-        if(btn) {
-            let rp_id = btn.dataset.id;
-            STORAGE_KEYS.saveData(STORAGE_KEYS.CURRENT_PASSAGE_INDEX, rp_id);
-            // Hiển thị bài đọc
-            renderer.displayPassage(rp_id);
-            // Hiển thị câu hỏi
-            renderer.displayQuestions(rp_id);
-            renderer.displayOldAnswers();
-            disableTakingExam(exam, renderer);
-        }
-    });
-    
-
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        const btn = e.target.closest('#btn_submit');
-        if(btn) {
-            submitTest(exam, renderer);
-        }
-    });
-
-    ELEMENTS.btns_zone.addEventListener('click', (e) => {
-        const btn = e.target.closest('#btn_done');
-
-        if(btn) {
-          
-            goToHomepage();
-        }
-    });
-    
-}
-
-export function goToHomepage() {
+function goToHomepage() {
     Swal.fire({
         title: 'Bạn có chắc chắn muốn về trang chủ',
         text: "Bạn sẽ không thể xem lại kết quả bài thi !",
@@ -467,20 +443,10 @@ function submitTest(exam, renderer) {
     }).then((result) => {
         if (result.isConfirmed) {
             // User bị vô hiệu hóa bài thi
-            STORAGE_KEYS.saveData(STORAGE_KEYS.SUBMITTED, 'true');
+            changeExamToFinish();
             disableTakingExam(exam, renderer);
         
-            Swal.fire({
-                title: 'Nộp bài thành công !',
-                text: `Bạn đã làm đúng: ${totalCorrectQuestions}/${totalQuestions} câu`,
-                icon: 'success',
-                confirmButtonText: 'Tôi đã rõ !',
-                confirmButtonColor: '#3085d6',
-                backdrop: true, // Hiệu ứng làm mờ nền
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
-                }
-            });
+            renderer.popupSuccessSubmit(totalCorrectQuestions, totalQuestions);
         } else {
             if(num_answers < 40) {
                 let notAnswerList = getNotAnsweredQuestions();
@@ -490,6 +456,21 @@ function submitTest(exam, renderer) {
                 sortedByPassage['Passage 2'] = [];
                 sortedByPassage['Passage 3'] = [];
                 sortedByPassage['Passage 4'] = [];
+
+                /*
+                const structure = {
+                    "Passage 1": { start: 1, end: 10 },
+                    "Passage 2": { start: 11, end: 20 },
+                    // ...
+                };
+
+                // Duyệt qua cấu trúc này để phân loại, code sẽ tự động chạy với mọi độ dài bài thi
+                for (const [passageName, range] of Object.entries(structure)) {
+                    if (question_id >= range.start && question_id <= range.end) {
+                        sortedByPassage[passageName].push(question_id);
+                    }
+                }
+                */
 
                 for(let i in notAnswerList) {
                     let question_id = Number(notAnswerList[i]);
@@ -521,17 +502,7 @@ function submitTest(exam, renderer) {
                 popupHTML += '</div>';
                 
 
-                Swal.fire({
-                    title: 'Các câu bạn chưa làm:',
-                    html: popupHTML,
-                    icon: 'warning',
-                    confirmButtonText: 'Tôi đã rõ !',
-                    confirmButtonColor: '#3085d6',
-                    backdrop: true, // Hiệu ứng làm mờ nền
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
-                    }
-                });
+                renderer.popupNotAnswers(popupHTML);
             }
         }
     });

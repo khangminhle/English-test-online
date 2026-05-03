@@ -3,13 +3,106 @@ import { formatTime } from "../utils.js";
 
 export class ExamRender {
 
-	static renderLayout() {
+	renderLayout() {
 		this.displayTimeArea();
 		this.displayContent();
-		console.log('render exam layout');
 	}
 
-	static updateTime(timeleft) {
+	disableUserChoice() {
+	    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+	        radio.disabled = true;
+	    });
+	}
+
+	showCorrectAnswers(correctAnswers, userCorrectAnswers) {
+	    if(!correctAnswers) {return;}
+
+	    if(!userCorrectAnswers) {userCorrectAnswers = [];}
+	 
+	    for(let i in correctAnswers) {
+	        const id = `lb${i}${correctAnswers[i]}`;
+
+	        const element = document.querySelector(`label[data-id="${id}"]`);
+
+	        if (element) {
+	            if(userCorrectAnswers.includes(id.replace('lb',''))) {
+	                element.classList.add('text-success', 'fw-bold');
+	            } else {
+	                element.classList.add('text-success');
+	            }
+	        }
+	    }
+	}
+
+    showIncorrectAnswers(incorrectAnswers) {
+	    if(!incorrectAnswers) {return;}
+
+	  
+	    for(let i in incorrectAnswers) {
+	        const id = 'lb' + incorrectAnswers[i];
+	        const element = document.querySelector(`label[data-id="${id}"]`);
+	        if (element) {
+	            element.classList.add('text-danger', 'fw-bold');
+	        }
+	    } 
+	}
+
+	popupCorrectAnswers(totalCorrectQuestions, totalQuestions) {
+		Swal.fire({
+	        title: 'Hết thời gian !',
+	        text: `Bạn đã làm đúng: ${totalCorrectQuestions}/${totalQuestions} câu`,
+	        icon: 'success',
+	        confirmButtonText: 'Tôi đã rõ !',
+	        confirmButtonColor: '#3085d6',
+	        backdrop: true, // Hiệu ứng làm mờ nền
+	        showClass: {
+	            popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
+	        }
+    	});
+	}
+
+	popupSuccessSubmit(totalCorrectQuestions, totalQuestions) {
+		Swal.fire({
+	        title: 'Nộp bài thành công !',
+	        text: `Bạn đã làm đúng: ${totalCorrectQuestions}/${totalQuestions} câu`,
+	        icon: 'success',
+	        confirmButtonText: 'Tôi đã rõ !',
+	        confirmButtonColor: '#3085d6',
+	        backdrop: true, // Hiệu ứng làm mờ nền
+	        showClass: {
+	            popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
+	        }
+	    });
+	}
+
+	popupNotAnswers(html) {
+		Swal.fire({
+            title: 'Các câu bạn chưa làm:',
+            html: popupHTML,
+            icon: 'warning',
+            confirmButtonText: 'Tôi đã rõ !',
+            confirmButtonColor: '#3085d6',
+            backdrop: true, // Hiệu ứng làm mờ nền
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
+            }
+        });
+	}
+
+	popupNoAnswer() {
+		Swal.fire({
+            title: 'Bạn chưa làm câu hỏi nào !',
+            icon: 'error',
+            confirmButtonText: 'Tôi đã rõ !',
+            confirmButtonColor: '#3085d6',
+            backdrop: true, // Hiệu ứng làm mờ nền
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown' // Hiệu ứng xuất hiện
+            }
+        });
+	}
+
+	updateTime(timeleft) {
 		let element = document.getElementById('timer');
 
 		if(!element) {return;}
@@ -17,7 +110,7 @@ export class ExamRender {
 		element.innerText = formatTime(timeleft);
 	}
 
-	static displayTimeArea() {
+	displayTimeArea() {
 		if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {
 			this.hideTimeArea();
 			return;
@@ -40,26 +133,26 @@ export class ExamRender {
 		element.innerHTML = html;
 	}
 
-	static hideTimeArea() {
+	hideTimeArea() {
 		let element = document.getElementById('time_area');
 		if(!element) {return;}
 
 		element.style.display = 'none';
 	}
 
-    static hideBtnSubmit() {
+    hideBtnSubmit() {
     	let element = document.getElementById('btn_submit');
 		if(!element) {return;}
 		element.style.display = 'none';
     }
 
-    static displayBtnHomepage() {
+    displayBtnHomepage() {
     	let element = document.getElementById('btn_done');
 		if(!element) {return;}
 		element.style.display = 'inline-block';
     }
 
-	static displayContent() {
+	displayContent() {
 		let element = document.getElementById('exam_container');
 
 		if(!element) {return;}
@@ -81,7 +174,7 @@ export class ExamRender {
 		element.innerHTML = html;
 	}
 
-	static changeBtnPauseTimeContent(content, oldClass, newClass) {
+	changeBtnPauseTimeContent(content, oldClass, newClass) {
 		console.log(ELEMENTS.btn_pause_time);
 		if(!ELEMENTS.btn_pause_time) {return;}
 
@@ -89,7 +182,7 @@ export class ExamRender {
         ELEMENTS.btn_pause_time.classList.replace(oldClass, newClass);
 	}
 
-	static playSoundEndExam() {
+	playSoundEndExam() {
 	    let audio = document.getElementById('audio_end_exam');
 
 	    if(audio) {
@@ -98,5 +191,39 @@ export class ExamRender {
 		    });
     	}
     }
+
+    displayLeftContent(html) {
+    	ELEMENTS.left_view = document.getElementById('left_view');
+    	if(!ELEMENTS.left_view) {return;}
+
+    	ELEMENTS.left_view.innerHTML = html;
+    }
+
+    displayRightContent(html) {
+    	ELEMENTS.right_view = document.getElementById('right_view');
+    	if(!ELEMENTS.right_view) {return;}
+
+    	ELEMENTS.right_view.innerHTML = html;
+    }
+
+    displayOldAnswers() {
+	    let answered = STORAGE_KEYS.getData(STORAGE_KEYS.USER_ANSWERS); 
+	    if(answered) {
+	        for(let ans in answered) {
+	            let id_ans = ans + answered[ans];
+	            const element = document.querySelector(`input[data-id="${id_ans}"]`);
+	            if (element) {
+	                element.checked = true;
+	            }
+	        }
+	    }
+	}
+
+	displayButtonsZone(html) {
+		ELEMENTS.btns_zone = document.getElementById('btns_zone');
+		if(!ELEMENTS.btns_zone) {return;}
+
+	    ELEMENTS.btns_zone.innerHTML = html;
+	}
 }
 

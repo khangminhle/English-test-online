@@ -7,20 +7,23 @@ export class Exam {
         this.duration = durationInSeconds;
         this.onTimeUpdateCallback = null;
         this.onTimeFinishCallback = null;
-        this.timer = new TimerCountDown(durationInSeconds,
-            (timeLeft) => {
-                if(this.onTimeUpdateCallback) {
-                    this.onTimeUpdateCallback(timeLeft);
-                    
+        if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {
+            this.timer = null;
+        } else {
+            this.timer = new TimerCountDown(durationInSeconds,
+                (timeLeft) => {
+                    if(this.onTimeUpdateCallback) {
+                        this.onTimeUpdateCallback(timeLeft);
+                        
+                    }
+                }, 
+                () => {
+                    if(this.onTimeFinishCallback) {
+                        this.onTimeFinishCallback();
+                    }
                 }
-            }, 
-            () => {
-                if(this.onTimeFinishCallback) {
-                    this.onTimeFinishCallback();
-                }
-                STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
-            }
-        );
+            );
+        }
     }
 
     onTimeUpdate(callback) {
@@ -32,9 +35,11 @@ export class Exam {
     }
 
     resume(seconds) {
+
         if(this.timer) {
-            this.timer.stop();
+            this.stop();
         }
+
         this.timer = new TimerCountDown(seconds,
             (timeLeft) => {
                 if (this.onTimeUpdateCallback) {
@@ -45,7 +50,6 @@ export class Exam {
                 if(this.onTimeFinishCallback) {
                     this.onTimeFinishCallback();
                 }
-                STORAGE_KEYS.saveData(STORAGE_KEYS.IS_FINISHED, 'true');
             }
         );
         this.start();
@@ -53,8 +57,7 @@ export class Exam {
 
     start() {
         // Bắt đầu bài thi
-        if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {return;}
-
+      
         if(!this.timer) {return;}
         this.timer.start();
         STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'false');
@@ -62,10 +65,9 @@ export class Exam {
 
     stop() {
         // Dừng bài thi
-        if(STORAGE_KEYS.getData(STORAGE_KEYS.IS_FINISHED) === 'true') {return;}
-
         if(this.timer) {
             this.timer.stop();
+            this.timer = null;
             STORAGE_KEYS.saveData(STORAGE_KEYS.IS_PAUSED, 'true');
         }
     }

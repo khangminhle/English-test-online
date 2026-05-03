@@ -59,11 +59,5 @@ function setBtnChooseExam() {
     		let go_to_url = `${BASE_URL}/${btn.dataset.id}`;
     		window.location.href = go_to_url;
     	}
-    	/*
-        if(e.target.classList.contains('btn-chooose-exam')) {
-            let exam = e.target.dataset.id;
-            console.log(exam);
-        }
-        */
     });
 }
