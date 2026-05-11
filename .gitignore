@@ -1,0 +1,16 @@
+# Thư mục thư viện (rất nặng, không nên push)
+node_modules/
+dist/
+build/
+
+# File chứa thông tin bảo mật, mật khẩu, API key
+.env
+.env.local
+
+# File cấu hình hệ điều hành tạo ra
+.DS_Store
+Thumbs.db
+
+# File log lỗi
+npm-debug.log*
+yarn-error.log*
