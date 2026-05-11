@@ -36,7 +36,6 @@ export class ExamRender {
 
     showIncorrectAnswers(incorrectAnswers) {
 	    if(!incorrectAnswers) {return;}
-
 	  
 	    for(let i in incorrectAnswers) {
 	        const id = 'lb' + incorrectAnswers[i];

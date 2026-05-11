@@ -5,12 +5,17 @@ import { ReadingExamRender } from './render/readingExamRender.js'; // RENDER
 //import { settingExam } from './events/examEvents.js'; // LOGIC UI
 import { ExamController } from './controllers/examController.js';
 
+
+
+
 async function main() { 
     const pageType = document.body.dataset.page;
     console.log(pageType);
     if(pageType === 'readingExam') {
         const exam = new ReadingExam(10);
         await exam.loadData();
+        console.log('nhận đã data');
+        
         if(exam.checkValidData()) {
             console.log('Data hợp lệ!');
 
@@ -21,6 +26,7 @@ async function main() {
         } else {
             console.log('Data không hợp lệ!');
         }
+        
     }
 
     if(pageType === 'homepage') {

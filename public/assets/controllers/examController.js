@@ -11,7 +11,6 @@ export class ExamController {
 		this.exam = exam;
 		this.renderer = renderer;
 		this.audio = new AudioManager(`${BASE_URL}/assets/audios/bell.mp3`);
-		console.log('Am thanh:', this.audio);
 	}
 
 	settingExam() {
@@ -272,6 +271,7 @@ export class ExamController {
 	        
 	            this.renderer.popupSuccessSubmit(totalCorrectQuestions, totalQuestions);
 	        } else {
+	        	// Gợi ý các câu hỏi user chưa trả lời
 	            if(num_answers < 40) {
 
 	                // 1. Định nghĩa cấu trúc (Bạn có thể để cái này ở file config riêng)
